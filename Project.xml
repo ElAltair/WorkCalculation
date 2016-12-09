@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <name>Test</name>
+    <startDate> 0.0 </startDate>
+    <endDate> 20.0 </endDate>
+    <workList>
+        <work id="1">
+            <name>First Work</name>
+            <startDate>0.0</startDate>
+            <endDate/>
+            <duration>5.0</duration>
+            <params>ASAP</params>
+            <after/>
+        </work>
+        <work id ="2">
+            <name>Second Work</name>
+            <startDate>3.0</startDate>
+            <endDate/>
+            <duration>6.0</duration>
+            <params/>
+            <after>1</after>
+        </work>
+        <work id ="3">
+            <name>Third Work</name>
+            <startDate>4.0</startDate>
+            <endDate/>
+            <duration>8.0</duration>
+            <params/>
+            <after/>
+        </work>
+        <work id ="4">
+            <name>Four Work</name>
+            <startDate>4.0</startDate>
+            <endDate/>
+            <duration>8.0</duration>
+            <params/>
+            <after/>
+        </work>
+        <work id ="5">
+            <name>Five Work</name>
+            <startDate>4.0</startDate>
+            <endDate/>
+            <duration>8.0</duration>
+            <params/>
+            <after>3</after>
+        </work>
+        <work id ="6">
+            <name>Six Work</name>
+            <startDate>4.0</startDate>
+            <endDate/>
+            <duration>8.0</duration>
+            <params/>
+            <after>3</after>
+        </work>
+    </workList>
+</project>
