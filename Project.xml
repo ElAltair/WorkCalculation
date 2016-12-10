@@ -60,5 +60,13 @@
             <params/>
             <after>7</after>
         </work>
+        <work id ="8">
+            <name>Eight Work</name>
+            <startDate>4.0</startDate>
+            <endDate/>
+            <duration>8.0</duration>
+            <params/>
+            <after/>
+        </work>
     </workList>
 </project>

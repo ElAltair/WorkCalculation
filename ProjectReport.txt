@@ -1,0 +1,20 @@
+------- Project -------
+Name: Test
+StartDate: 0.0
+EndDate: 20.0
+------------------------------------------------------------------------
+Work list:
+Id: 1 StartDate: 0.0 End: 5.0
+Id: 2 StartDate: 3.0 End: 9.0
+Id: 3 StartDate: 4.0 End: 12.0
+Id: 5 StartDate: 4.0 End: 12.0
+Id: 6 StartDate: 4.0 End: 12.0
+Id: 7 StartDate: 4.0 End: 12.0
+Id: 4 StartDate: 4.0 End: 12.0
+Id: 8 StartDate: 4.0 End: 12.0
+------------------------------------------------------------------------
+| -->   First Work -->  Second Work --> |
+| -->   Third Work -->    Five Work --> |
+                  \-->     Six Work -->   Seven Work -->    Four Work --> |
+| -->   Eight Work --> |
+------------------------------------------------------------------------

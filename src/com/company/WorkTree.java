@@ -1,5 +1,6 @@
 package com.company;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,13 +46,28 @@ public class WorkTree {
 
     void printTree()
     {
-        String destination = "| -> ";
-        WorkTreeNode node = startTreeNode;
-        Integer treeDepth = 0;
-        AtomicBoolean printFlag = new AtomicBoolean(false);
-        //printTreeRecursively(node,destination);
-        //System.out.print("| --> ");
-        printTreeRecursivelyBeauty(node, destination, treeDepth, printFlag);
+        try{
+            WorkTreeNode node = startTreeNode;
+            Integer treeDepth = 0;
+            Integer itemSpacer = 12;
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(System.out));
+            AtomicBoolean printFlag = new AtomicBoolean(false);
+            printTreeRecursivelyBeauty(writer, node, treeDepth, printFlag, itemSpacer);
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+
+    }
+
+    void printTree(PrintWriter writer)
+    {
+            WorkTreeNode node = startTreeNode;
+            Integer treeDepth = 0;
+            Integer itemSpacer = 12;
+            AtomicBoolean printFlag = new AtomicBoolean(false);
+            printTreeRecursivelyBeauty(writer, node, treeDepth, printFlag, itemSpacer);
 
     }
 
@@ -73,38 +89,37 @@ public class WorkTree {
         }
     }
 
-    void printTreeRecursivelyBeauty(WorkTreeNode node, String treeDestination, Integer depth, AtomicBoolean printFlag)
+    void printTreeRecursivelyBeauty(PrintWriter w, WorkTreeNode node, Integer depth, AtomicBoolean printFlag, Integer itemSpacer)
     {
-        depth++;
-        String tempDest;
-        if(node.getEndNode() != null) {
-            System.out.println(" --> |");
-            if(depth >= 2)
-                printFlag.getAndSet(true);
-            return;
-        }
-        ArrayList<WorkTreeNode> childs = node.getChilds();
-
-        for (WorkTreeNode it: childs) {
-            //tempDest = treeDestination + it.getWork().getName() + " -> ";
-            tempDest = it.getWork().getName();
-
-            if(depth == 1)
-                System.out.print("|");
-
-            if(depth >= 2 && printFlag.get()) {
-                String spacer = "";
-                for (int i = 0; i < tempDest.length() + 2; ++i) {
-                    spacer += " ";
-                }
-                spacer += "\\--> ";
-                System.out.print(spacer + it.getWork().getName());
+            depth++;
+            if (node.getEndNode() != null) {
+                w.println(" --> |");
+                if (depth >= 2)
+                    printFlag.getAndSet(true);
+                return;
             }
-            else
-                System.out.print("--> " + it.getWork().getName());
-            printFlag.getAndSet(false);
-            printTreeRecursivelyBeauty(it, tempDest, depth, printFlag);
-        }
+            ArrayList<WorkTreeNode> childs = node.getChilds();
+
+            for (WorkTreeNode it : childs) {
+
+                if (depth == 1)
+                    w.print("|");
+
+                if (depth >= 2 && printFlag.get()) {
+                    String spacer = "";
+                    for (int i = 0; i < 6 + itemSpacer; ++i) {
+                        spacer += " ";
+                    }
+                    spacer += "\\--> ";
+                    w.print(spacer);
+                    w.format("%1$" + itemSpacer.toString() + "s", it.getWork().getName());
+                } else {
+                    w.print(" --> ");
+                    w.format("%1$" + itemSpacer.toString()+ "s", it.getWork().getName());
+                }
+                printFlag.getAndSet(false);
+                printTreeRecursivelyBeauty(w, it, depth, printFlag, itemSpacer);
+            }
     }
     private WorkTreeNode findWorkRecursively(WorkTreeNode node, Work toFind)
     {

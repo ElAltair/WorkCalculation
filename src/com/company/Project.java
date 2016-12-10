@@ -9,8 +9,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.DataFormatException;
@@ -178,12 +177,58 @@ public class Project {
         }
     }
 
+    public void printProject(String fileName)
+    {
+        try {
+            File file = new File(fileName);
+            //OutputStream outS = new FileOutputStream(file);
+            //outS = System.out;
+            OutputStream fOStream = new FileOutputStream(file);
+            OutputStreamWriter outSWriter = new OutputStreamWriter(fOStream);
+            PrintWriter writer = new PrintWriter(outSWriter);
+
+            String partDelimeterUnit = "------------------------";
+            String partDelimeter =  "";
+            for(int i = 0; i < 3; ++i)
+                partDelimeter += partDelimeterUnit;
+
+            writer.println("------- Project -------");
+            writer.println("Name: " + name);
+            writer.println("StartDate: " + startDate);
+            writer.println("EndDate: " + endDate);
+            writer.println(partDelimeter);
+            writer.println("Work list:");
+            for (Work w: workMap.values()) {
+                writer.println(w);
+            }
+            writer.println(partDelimeter);
+            projectTree.printTree(writer);
+            writer.println(partDelimeter);
+            writer.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            System.err.println("Can't load file with name = '" + fileName + ".txt'");
+        }
+    }
     public void printProject()
     {
+        String partDelimeterUnit = "------------------------";
+        String partDelimeter =  "";
+        for(int i = 0; i < 3; ++i)
+            partDelimeter += partDelimeterUnit;
+
         System.out.println("------- Project -------");
         System.out.println("Name: " + name);
         System.out.println("StartDate: " + startDate);
         System.out.println("EndDate: " + endDate);
+        System.out.println(partDelimeter);
+        System.out.println("Work list:");
+        for (Work w: workMap.values()) {
+            System.out.println(w);
+        }
+        System.out.println(partDelimeter);
         projectTree.printTree();
+        System.out.println(partDelimeter);
     }
 }
