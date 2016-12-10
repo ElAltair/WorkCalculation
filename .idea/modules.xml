@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/WorkOptimization.iml" filepath="$PROJECT_DIR$/WorkOptimization.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WorkCalculation.iml" filepath="$PROJECT_DIR$/WorkCalculation.iml" />
     </modules>
   </component>
 </project>

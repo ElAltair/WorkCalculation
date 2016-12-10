@@ -11,7 +11,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.zip.DataFormatException;
 
 public class Project {
 
@@ -21,19 +23,25 @@ public class Project {
     private File xmlFile;
 
     private WorkTree projectTree;
-    private HashMap<Integer, Work> workMap;
+    private Map<Integer, Work> workMap;
 
     public Project(String iName)
     {
         projectTree = new WorkTree();
-        workMap = new HashMap<>();
+        workMap = new LinkedHashMap<>();
         name = iName;
     }
-    public Project(String iName, String ixmlFile)
+    public Project(String iName, String ixmlFile) throws DataFormatException
     {
         this(iName);
-        parseXML(ixmlFile);
-        projectTree.generate(workMap);
+        try{
+            parseXML(ixmlFile);
+            projectTree.generate(workMap);
+        }
+        catch (DataFormatException e)
+        {
+            throw e;
+        }
     }
 
     public Project(String iName, Double iStartDate, Double iEndDate)
@@ -58,7 +66,7 @@ public class Project {
         name = iName;
     }
 
-    public void parseXML(String fileName)
+    public void parseXML(String fileName) throws DataFormatException
     {
         xmlFile = new File(fileName);
         try {
@@ -149,13 +157,15 @@ public class Project {
                         Work temp;
                         if((temp = workMap.get(workId)) != null)
                             work.setAfter(temp);
+                        else
+                            throw new DataFormatException("Error in '" + fileName + "'. Work with id = " + workId + " is not created");
 
                     }
 
                     if(workMap.get(work.getId()) == null)
                         workMap.put(work.getId(), work);
                     else
-                        throw new RuntimeException("Error in '" + fileName + "'. Work id = " + work.getId() + " is already used");
+                        throw new DataFormatException("Error in '" + fileName + "'. Work id = " + work.getId() + " is already used");
 
                 }
             }
@@ -170,9 +180,10 @@ public class Project {
 
     public void printProject()
     {
+        System.out.println("------- Project -------");
         System.out.println("Name: " + name);
         System.out.println("StartDate: " + startDate);
         System.out.println("EndDate: " + endDate);
-        projectTree.printTreeRecursivelyStart();
+        projectTree.printTree();
     }
 }

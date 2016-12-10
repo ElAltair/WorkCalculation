@@ -28,14 +28,6 @@
             <params/>
             <after/>
         </work>
-        <work id ="4">
-            <name>Four Work</name>
-            <startDate>4.0</startDate>
-            <endDate/>
-            <duration>8.0</duration>
-            <params/>
-            <after/>
-        </work>
         <work id ="5">
             <name>Five Work</name>
             <startDate>4.0</startDate>
@@ -51,6 +43,22 @@
             <duration>8.0</duration>
             <params/>
             <after>3</after>
+        </work>
+        <work id ="7">
+            <name>Seven Work</name>
+            <startDate>4.0</startDate>
+            <endDate/>
+            <duration>8.0</duration>
+            <params/>
+            <after>6</after>
+        </work>
+        <work id ="4">
+            <name>Four Work</name>
+            <startDate>4.0</startDate>
+            <endDate/>
+            <duration>8.0</duration>
+            <params/>
+            <after>7</after>
         </work>
     </workList>
 </project>

@@ -5,7 +5,13 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Project project = new Project("Test","Project.xml");
-        project.printProject();
+        try{
+            Project project = new Project("Test","Project.xml");
+            project.printProject();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
     }
 }

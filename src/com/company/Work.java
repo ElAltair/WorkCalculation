@@ -104,7 +104,7 @@ public class Work {
 
     @Override
     public String toString() {
-        return "Start: " + startDate.toString() + " " + "End: " + endDate.toString();
+        return "Id: " + id.toString() + " StartDate: " + startDate.toString() + " End: " + endDate.toString();
     }
 
 }
