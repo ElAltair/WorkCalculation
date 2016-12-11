@@ -83,6 +83,8 @@ public class Work {
         workParam = param;
     }
 
+    public  Double getStart() { return startDate;}
+
     public Double getEnd() {
         return endDate;
     }
@@ -102,9 +104,17 @@ public class Work {
         return id;
     }
 
+    public Double getDuration(){ return duration;}
+
     @Override
     public String toString() {
-        return "Id: " + id.toString() + " StartDate: " + startDate.toString() + " End: " + endDate.toString();
+        if(prevWork != null)
+        return "Id: " + id.toString() + " | Name: " + name +  " | StartDate: "
+                + startDate.toString() + " | Duration: " + duration + " | End: " + endDate.toString() + " PrevWork = " + prevWork.getId().toString();
+        else
+            return "Id: " + id.toString() + " | Name: " + name +  " | StartDate: "
+                    + startDate.toString() + " | Duration: " + duration + " | End: " + endDate.toString();
+
     }
 
 }

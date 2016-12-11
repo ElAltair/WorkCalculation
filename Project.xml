@@ -6,23 +6,15 @@
     <workList>
         <work id="1">
             <name>First Work</name>
-            <startDate>0.0</startDate>
+            <startDate/>
             <endDate/>
             <duration>5.0</duration>
             <params>ASAP</params>
             <after/>
         </work>
-        <work id ="2">
-            <name>Second Work</name>
-            <startDate>3.0</startDate>
-            <endDate/>
-            <duration>6.0</duration>
-            <params/>
-            <after>1</after>
-        </work>
         <work id ="3">
             <name>Third Work</name>
-            <startDate>4.0</startDate>
+            <startDate/>
             <endDate/>
             <duration>8.0</duration>
             <params/>
@@ -30,43 +22,59 @@
         </work>
         <work id ="5">
             <name>Five Work</name>
-            <startDate>4.0</startDate>
+            <startDate/>
             <endDate/>
-            <duration>8.0</duration>
+            <duration>3.0</duration>
             <params/>
             <after>3</after>
         </work>
         <work id ="6">
             <name>Six Work</name>
-            <startDate>4.0</startDate>
+            <startDate/>
             <endDate/>
-            <duration>8.0</duration>
+            <duration>1.0</duration>
             <params/>
             <after>3</after>
         </work>
         <work id ="7">
             <name>Seven Work</name>
-            <startDate>4.0</startDate>
+            <startDate/>
             <endDate/>
-            <duration>8.0</duration>
+            <duration>6.0</duration>
             <params/>
             <after>6</after>
         </work>
         <work id ="4">
             <name>Four Work</name>
-            <startDate>4.0</startDate>
+            <startDate/>
             <endDate/>
-            <duration>8.0</duration>
+            <duration>2.0</duration>
             <params/>
-            <after>7</after>
+            <after>6</after>
         </work>
         <work id ="8">
             <name>Eight Work</name>
-            <startDate>4.0</startDate>
+            <startDate/>
             <endDate/>
-            <duration>8.0</duration>
+            <duration>3.0</duration>
             <params/>
-            <after/>
+            <after>4</after>
+        </work>
+        <work id ="9">
+            <name>Nine Work</name>
+            <startDate/>
+            <endDate/>
+            <duration>3.0</duration>
+            <params/>
+            <after>8</after>
+        </work>
+        <work id ="10">
+            <name>Nine Work</name>
+            <startDate/>
+            <endDate/>
+            <duration>3.0</duration>
+            <params/>
+            <after>4</after>
         </work>
     </workList>
 </project>

@@ -4,12 +4,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.DataFormatException;
@@ -24,6 +23,26 @@ public class Project {
     private WorkTree projectTree;
     private Map<Integer, Work> workMap;
 
+    private PrintWriter getProjectWriter(String fileName) throws IOException
+    {
+        File file = new File(fileName);
+        //OutputStream outS = new FileOutputStream(file);
+        //outS = System.out;
+        OutputStream fOStream = new FileOutputStream(file);
+        OutputStreamWriter outSWriter = new OutputStreamWriter(fOStream);
+        PrintWriter writer = new PrintWriter(outSWriter);
+        return writer;
+
+    }
+
+    private PrintWriter getProjectWriter()
+    {
+            OutputStream fOStream = System.out;
+            OutputStreamWriter outSWriter = new OutputStreamWriter(fOStream);
+            PrintWriter writer = new PrintWriter(outSWriter);
+            return writer;
+    }
+
     public Project(String iName)
     {
         projectTree = new WorkTree();
@@ -33,14 +52,8 @@ public class Project {
     public Project(String iName, String ixmlFile) throws DataFormatException
     {
         this(iName);
-        try{
-            parseXML(ixmlFile);
-            projectTree.generate(workMap);
-        }
-        catch (DataFormatException e)
-        {
-            throw e;
-        }
+        parseXML(ixmlFile);
+        projectTree.generate(workMap);
     }
 
     public Project(String iName, Double iStartDate, Double iEndDate)
@@ -168,11 +181,7 @@ public class Project {
 
                 }
             }
-        } catch (ParserConfigurationException ex) {
-            ex.printStackTrace(System.out);
-        } catch (SAXException ex) {
-            ex.printStackTrace(System.out);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace(System.out);
         }
     }
@@ -180,12 +189,8 @@ public class Project {
     public void printProject(String fileName)
     {
         try {
-            File file = new File(fileName);
-            //OutputStream outS = new FileOutputStream(file);
-            //outS = System.out;
-            OutputStream fOStream = new FileOutputStream(file);
-            OutputStreamWriter outSWriter = new OutputStreamWriter(fOStream);
-            PrintWriter writer = new PrintWriter(outSWriter);
+
+            PrintWriter writer = getProjectWriter(fileName);
 
             String partDelimeterUnit = "------------------------";
             String partDelimeter =  "";
@@ -202,33 +207,101 @@ public class Project {
                 writer.println(w);
             }
             writer.println(partDelimeter);
-            projectTree.printTree(writer);
+            printWorks(writer, workMap);
+            //projectTree.printTree(writer);
             writer.println(partDelimeter);
             writer.close();
         }
-        catch (FileNotFoundException e)
+        catch (Exception e)
         {
-            System.err.println("Can't load file with name = '" + fileName + ".txt'");
+            System.err.println(e.getMessage());
+
         }
     }
     public void printProject()
     {
-        String partDelimeterUnit = "------------------------";
-        String partDelimeter =  "";
-        for(int i = 0; i < 3; ++i)
-            partDelimeter += partDelimeterUnit;
+        try{
+            PrintWriter writer = getProjectWriter();
 
-        System.out.println("------- Project -------");
-        System.out.println("Name: " + name);
-        System.out.println("StartDate: " + startDate);
-        System.out.println("EndDate: " + endDate);
-        System.out.println(partDelimeter);
-        System.out.println("Work list:");
-        for (Work w: workMap.values()) {
-            System.out.println(w);
+            String partDelimeterUnit = "------------------------";
+            String partDelimeter = "";
+            for (int i = 0; i < 3; ++i)
+                partDelimeter += partDelimeterUnit;
+
+            writer.println("------- Project -------");
+            writer.println("Name: " + name);
+            writer.println("StartDate: " + startDate);
+            writer.println("EndDate: " + endDate);
+            writer.println(partDelimeter);
+            writer.println("Work list:");
+            for (Work w : workMap.values()) {
+                writer.println(w);
+            }
+            writer.println(partDelimeter);
+            printWorks(writer, workMap);
+            //projectTree.printTree(writer);
+            writer.println(partDelimeter);
+            writer.close();
         }
-        System.out.println(partDelimeter);
-        projectTree.printTree();
-        System.out.println(partDelimeter);
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public void forwardTreeMoving(WorkTreeNode node, Double startValue)
+    {
+
+        if(node.isEndNode()) {
+            return;
+        }
+
+        ArrayList<WorkTreeNode> childs = node.getChilds();
+
+        for (WorkTreeNode it: childs) {
+            Double duration = it.getWork().getDuration();
+            it.getWork().setStartDate(startValue);
+            forwardTreeMoving(it, it.getWork().getEnd());
+        }
+    }
+
+    public void backwardTreeMoving(WorkTreeNode node, Double endValue)
+    {
+
+    }
+
+    public void analyzeWorks()
+    {
+        analyzeForwardWork();
+        //analyzeBackwardWork();
+    }
+
+    public void analyzeForwardWork()
+    {
+        WorkTreeNode startTreeNode = projectTree.getStartTreeNode();
+        forwardTreeMoving(startTreeNode, startDate);
+    }
+
+    public void analyzeBackwardWork()
+    {
+        WorkTreeNode endTreeNode = projectTree.getEndTreeNode();
+        forwardTreeMoving(endTreeNode, endDate);
+    }
+
+    void printWorks(PrintWriter writer, Map<Integer, Work> workList)
+    {
+        for(Work it: workList.values())
+        {
+            String spacer = "";
+            String length = "";
+            Double duration = it.getDuration();
+            Double start = it.getStart();
+            for(int i = 0; i < it.getStart(); ++i)
+                spacer += " ";
+
+           for(int i =0; i < duration.intValue(); ++i)
+               length += "#";
+            writer.println(it.getId().toString() + ": " + spacer + length);
+        }
     }
 }

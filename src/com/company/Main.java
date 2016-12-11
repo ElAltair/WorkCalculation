@@ -7,6 +7,7 @@ public class Main {
 
         try{
             Project project = new Project("Test","Project.xml");
+            project.analyzeWorks();
             project.printProject("ProjectReport.txt");
             project.printProject();
         }

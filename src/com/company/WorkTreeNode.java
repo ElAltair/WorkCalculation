@@ -69,7 +69,7 @@ public class WorkTreeNode {
 
     public Work getWork()
     {
-        if (type != NodeType.StartNode || type != NodeType.EndNode)
+        if (type == NodeType.WorkNode)
         {
             return nodeWork;
         }
