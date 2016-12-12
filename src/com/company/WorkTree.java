@@ -25,9 +25,9 @@ public class WorkTree {
 
         for (Work w: workList.values()) {
 
-            Work prevWork = w.getPrevWork();
+            ArrayList<Work> prevWorks = w.getPrevWork();
 
-           if(prevWork == null)
+           if(prevWorks.size() == 0)
            {
                WorkTreeNode newNode = new WorkTreeNode(WorkTreeNode.NodeType.WorkNode, w);
                newNode.addEndNode(endTreeNode);
@@ -37,15 +37,17 @@ public class WorkTree {
            {
                WorkTreeNode newNode = new WorkTreeNode(WorkTreeNode.NodeType.WorkNode, w);
                newNode.addEndNode(endTreeNode);
-               WorkTreeNode findedNode = findWork(prevWork);
-               if(findedNode != null)
-                   findedNode.addChild(newNode);
-               newNode.setPrevNode(findedNode);
+               for(Work prevWork: prevWorks)
+               {
+                   WorkTreeNode findedNode = findWork(prevWork);
+                   if(findedNode != null)
+                       findedNode.addChild(newNode);
+                   newNode.setPrevNode(findedNode);
+
+               }
            }
 
         }
-        endTreeNode = currentNode;
-
     }
 
     void printTree()
@@ -82,7 +84,7 @@ public class WorkTree {
             System.out.println(treeDestination + "|");
             return;
         }
-        ArrayList<WorkTreeNode> childs = node.getChilds();
+        ArrayList<WorkTreeNode> childs = node.getNextNodes();
 
         for (WorkTreeNode it: childs) {
 
@@ -103,7 +105,7 @@ public class WorkTree {
                     printFlag.getAndSet(true);
                 return;
             }
-            ArrayList<WorkTreeNode> childs = node.getChilds();
+            ArrayList<WorkTreeNode> childs = node.getNextNodes();
 
             for (WorkTreeNode it : childs) {
 
@@ -181,7 +183,7 @@ public class WorkTree {
             return node;
         }
 
-        ArrayList<WorkTreeNode> childs = node.getChilds();
+        ArrayList<WorkTreeNode> childs = node.getNextNodes();
 
         for (WorkTreeNode it: childs) {
             returnNode = findWorkRecursively(it, toFind);
@@ -203,7 +205,7 @@ public class WorkTree {
             return node;
         }
 
-        ArrayList<WorkTreeNode> childs = node.getChilds();
+        ArrayList<WorkTreeNode> childs = node.getNextNodes();
 
         for (WorkTreeNode it: childs) {
             returnNode = findWorkRecursivelyByName(it, workName);
@@ -225,7 +227,7 @@ public class WorkTree {
             return node;
         }
 
-        ArrayList<WorkTreeNode> childs = node.getChilds();
+        ArrayList<WorkTreeNode> childs = node.getNextNodes();
 
         for (WorkTreeNode it: childs) {
             returnNode = findWorkRecursivelyById(it, id);

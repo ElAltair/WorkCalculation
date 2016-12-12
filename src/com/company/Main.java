@@ -8,11 +8,12 @@ public class Main {
         try{
             Project project = new Project("Test","Project.xml");
             project.analyzeWorks();
-            project.printProject("ProjectReport.txt");
             project.printProject();
+            project.printProject("ProjectReport.txt");
         }
         catch (Exception e)
         {
+            System.out.println(e.getStackTrace());
             System.out.println(e.getMessage());
         }
     }

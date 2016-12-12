@@ -30,8 +30,7 @@ public class Project {
         //outS = System.out;
         OutputStream fOStream = new FileOutputStream(file);
         OutputStreamWriter outSWriter = new OutputStreamWriter(fOStream);
-        PrintWriter writer = new PrintWriter(outSWriter);
-        return writer;
+        return new PrintWriter(outSWriter);
 
     }
 
@@ -160,18 +159,29 @@ public class Project {
                         work.setParam(Work.WorkParam.valueOf(params));
                     }
 
-                    String after = el.getElementsByTagName("after").item(0).getTextContent();
-                    if(after != null && !after.isEmpty())
+                    NodeList afterList = el.getElementsByTagName("after");
+                    //String after = el.getElementsByTagName("after")
+                    //        .item(0).getTextContent();
+                    for(int j = 0; j < afterList.getLength(); ++j)
                     {
-                        System.out.println(el.getElementsByTagName("after").item(0).getTextContent());
-                        Integer workId = Integer.parseInt(after);
 
-                        Work temp;
-                        if((temp = workMap.get(workId)) != null)
-                            work.setAfter(temp);
-                        else
-                            throw new DataFormatException("Error in '" + fileName + "'. Work with id = " + workId + " is not created");
+                        Node afterNode =  afterList.item(j);
+                        if(afterNode.getNodeType() == Node.ELEMENT_NODE)
+                        {
+                            Element after = (Element) afterNode;
+                            String afterValue = after.getTextContent();
+                            if(afterValue != null && !afterValue.isEmpty())
+                            {
+                                Integer workId = Integer.parseInt(afterValue);
 
+                                Work temp;
+                                if((temp = workMap.get(workId)) != null)
+                                    work.setAfter(temp);
+                                else
+                                    throw new DataFormatException("Error in '" + fileName + "'. Work with id = " + workId + " is not created");
+
+                            }
+                        }
                     }
 
                     if(workMap.get(work.getId()) == null)
@@ -182,6 +192,7 @@ public class Project {
                 }
             }
         } catch (Exception ex) {
+            System.err.println(ex.getMessage());
             ex.printStackTrace(System.out);
         }
     }
@@ -207,7 +218,7 @@ public class Project {
                 writer.println(w);
             }
             writer.println(partDelimeter);
-            printWorks(writer, workMap);
+            drawWorkDiagramForward(writer, workMap);
             //projectTree.printTree(writer);
             writer.println(partDelimeter);
             writer.close();
@@ -238,7 +249,7 @@ public class Project {
                 writer.println(w);
             }
             writer.println(partDelimeter);
-            printWorks(writer, workMap);
+            drawWorkDiagramForward(writer, workMap);
             //projectTree.printTree(writer);
             writer.println(partDelimeter);
             writer.close();
@@ -249,59 +260,247 @@ public class Project {
         }
     }
 
-    public void forwardTreeMoving(WorkTreeNode node, Double startValue)
+    public void forwardTreeMoving(WorkTreeNode node)
     {
 
         if(node.isEndNode()) {
             return;
         }
 
-        ArrayList<WorkTreeNode> childs = node.getChilds();
+        Double maxStart = 0.0;
+        if(node.getPrevNodes().size() != 0 && !node.isStartNode())
+        {
+            ArrayList<WorkTreeNode> prevNodes = node.getPrevNodes();
+            for(WorkTreeNode i: prevNodes)
+            {
+                if(i.getWork().getStart() + i.getWork().getDuration() > maxStart)
+                    maxStart = i.getWork().getStart() + i.getWork().getDuration();
+            }
+
+            node.getWork().setStartDate(maxStart);
+
+        }
+
+        ArrayList<WorkTreeNode> childs = node.getNextNodes();
 
         for (WorkTreeNode it: childs) {
-            Double duration = it.getWork().getDuration();
-            it.getWork().setStartDate(startValue);
-            forwardTreeMoving(it, it.getWork().getEnd());
+            forwardTreeMoving(it);
         }
     }
 
-    public void backwardTreeMoving(WorkTreeNode node, Double endValue)
+    public void finalTreeMoving(WorkTreeNode node)
     {
+
+        if(node.isEndNode()) {
+            return;
+        }
+
+        if(node.getWork() != null)
+        {
+            double delta = node.getWork().getEnd() - node.getWork().getStart();
+            if(delta != node.getWork().getDuration())
+            {
+                node.getWork().unsetCriticalWork();
+                node.getWork().updateWorkLimits();
+                //for(WorkTreeNode it: node.getNextNodes())
+                // {
+                //     it.getWork().setStartDate(node.getWork().getEnd());
+                //     it.getWork().updateWorkLimits();
+                // }
+            }
+            else
+                node.getWork().setCriticalWork();
+        }
+
+        ArrayList<WorkTreeNode> childs = node.getNextNodes();
+
+        for (WorkTreeNode it: childs) {
+            finalTreeMoving(it);
+        }
+    }
+
+    public void backwardTreeMoving(WorkTreeNode node)
+    {
+        if(node.isStartNode())
+            return;
+
+        if(node.getWork() != null && node.getWork().getEnd() == 0)
+            node.getWork().setEndDate(endDate);
+        Double minStart = Double.MAX_VALUE;
+        if(node.getNextNodes().size() != 0 && !node.isEndNode())
+        {
+            ArrayList<WorkTreeNode> nextNodes = node.getNextNodes();
+            for(WorkTreeNode it: nextNodes){
+                if(it.getWork().getEnd() - it.getWork().getDuration() < minStart)
+                    minStart = it.getWork().getEnd() - it.getWork().getDuration();
+            }
+            node.getWork().setEndDate(minStart);
+        }
+
+        ArrayList<WorkTreeNode> prevNodes = node.getPrevNodes();
+        for(WorkTreeNode it: prevNodes) {
+            backwardTreeMoving(it);
+        }
+
 
     }
 
     public void analyzeWorks()
     {
-        analyzeForwardWork();
-        //analyzeBackwardWork();
+            PrintWriter writer = getProjectWriter();
+            analyzeForwardWork();
+            drawWorkDiagramForward(writer, workMap);
+            writer.println("---------------------------------");
+            analyzeBackwardWork();
+            drawWorkDiagramBackward(writer, workMap);
+            writer.println("---------------------------------");
+            finalAnalyzeWorks();
+            drawWorkDiagramForward(writer, workMap);
+            writer.close();
+    }
+
+    public void analyzeWorks(String fileName)
+    {
+        //try{
+            //PrintWriter writer = getProjectWriter(fileName);
+            analyzeForwardWork();
+            //drawWorkDiagramForward(writer, workMap);
+            analyzeBackwardWork();
+            //drawWorkDiagramBackward(writer, workMap);
+            finalAnalyzeWorks();
+            //drawWorkDiagramForward(writer, workMap);
+            //writer.close();
+
+        /*
+        }
+        catch (IOException e){
+            System.err.println(e.getStackTrace());
+            System.err.println(e.getMessage());
+        }
+        */
     }
 
     public void analyzeForwardWork()
     {
         WorkTreeNode startTreeNode = projectTree.getStartTreeNode();
-        forwardTreeMoving(startTreeNode, startDate);
+        forwardTreeMoving(startTreeNode);
+    }
+
+    public void finalAnalyzeWorks()
+    {
+        //WorkTreeNode startTreeNode = projectTree.getStartTreeNode();
+        //finalTreeMoving(startTreeNode);
+
+        for(Work w: workMap.values())
+        {
+            Double duration = w.getEnd() - w.getStart();
+            if(!duration.equals(w.getDuration()))
+            {
+                w.unsetCriticalWork();
+                w.updateWorkLimits();
+            }
+            else
+                w.setCriticalWork();
+        }
     }
 
     public void analyzeBackwardWork()
     {
         WorkTreeNode endTreeNode = projectTree.getEndTreeNode();
-        forwardTreeMoving(endTreeNode, endDate);
+        for(Work w: workMap.values())
+        {
+            w.setEndDate(endDate);
+        }
+        for(Work w: workMap.values()) {
+            System.out.println(w);
+        }
+        backwardTreeMoving(endTreeNode);
     }
 
-    void printWorks(PrintWriter writer, Map<Integer, Work> workList)
+    void drawWorkDiagramForward(PrintWriter writer, Map<Integer, Work> workList)
     {
         for(Work it: workList.values())
         {
             String spacer = "";
             String length = "";
+            String criticalPath = " ";
             Double duration = it.getDuration();
-            Double start = it.getStart();
             for(int i = 0; i < it.getStart(); ++i)
                 spacer += " ";
 
            for(int i =0; i < duration.intValue(); ++i)
                length += "#";
-            writer.println(it.getId().toString() + ": " + spacer + length);
+            if(it.isOnCrititcalPath())
+                criticalPath = "@";
+
+            writer.print(criticalPath + " ");
+            writer.format("%1$3s", it.getId().toString());
+            writer.println(spacer + length);
+        }
+    }
+
+    void drawWorkDiagramForward(Map<Integer, Work> workList)
+    {
+        for(Work it: workList.values())
+        {
+            String spacer = "";
+            String length = "";
+            String criticalPath = " ";
+            Double duration = it.getDuration();
+            for(int i = 0; i < it.getStart(); ++i)
+                spacer += " ";
+
+            for(int i =0; i < duration.intValue(); ++i)
+                length += "#";
+
+            if(it.isOnCrititcalPath())
+                criticalPath = "@";
+            System.out.print(criticalPath + " ");
+            System.out.format("%1$3s", it.getId().toString());
+            System.out.println(criticalPath + spacer + length);
+        }
+    }
+
+    void drawWorkDiagramBackward(PrintWriter writer, Map<Integer, Work> workList)
+    {
+        for(Work it: workList.values())
+        {
+            String spacer = "";
+            String length = "";
+            String criticalPath = " ";
+            Double duration = it.getDuration();
+            for(int i = 0; i < it.getEnd() - it.getDuration(); ++i)
+                spacer += " ";
+
+            for(int i =0; i < duration.intValue(); ++i)
+                length += "#";
+
+            if(it.isOnCrititcalPath())
+                criticalPath = "@";
+            writer.print(criticalPath + " ");
+            writer.format("%1$3s", it.getId().toString());
+            writer.println(spacer + length);
+        }
+    }
+
+    void drawWorkDiagramBackward(Map<Integer, Work> workList)
+    {
+        for(Work it: workList.values())
+        {
+            String spacer = "";
+            String length = "";
+            String criticalPath = " ";
+            Double duration = it.getDuration();
+            for(int i = 0; i < it.getEnd() - it.getDuration(); ++i)
+                spacer += " ";
+
+            for(int i =0; i < duration.intValue(); ++i)
+                length += "#";
+            if(it.isOnCrititcalPath())
+                criticalPath = "@";
+            System.out.print(criticalPath + " ");
+            System.out.format("%1$3s", it.getId().toString());
+            System.out.println(spacer + length);
         }
     }
 }

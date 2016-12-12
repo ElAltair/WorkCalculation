@@ -1,19 +1,26 @@
 package com.company;
 
+import java.util.ArrayList;
+
 public class Work {
 
-    public enum WorkParam { ASAP, AEAP}
+    public enum WorkParam { ASAP, ALAP}
 
     private WorkParam workParam;
     private Integer id;
     private Double startDate;
     private Double endDate;
     private Double duration;
-    private Work prevWork;
+    private Boolean isOnCrititcalPath;
+    private ArrayList<Work> prevWorks;
     private String name;
 
     private void updateEndDate() {
         endDate = startDate + duration;
+    }
+    private void updateStartDate()
+    {
+        startDate = endDate - duration;
     }
 
     public Work()
@@ -21,14 +28,17 @@ public class Work {
         name = null;
         startDate = 0.0;
         duration = 0.0;
-        prevWork = null;
+        endDate = 0.0;
+        isOnCrititcalPath = false;
+        prevWorks = new ArrayList<>();
     }
 
     public Work(String iName) {
         name = iName;
         startDate = 0.0;
         duration = 0.0;
-        prevWork = null;
+        endDate = 0.0;
+        prevWorks = new ArrayList<>();
         updateEndDate();
     }
 
@@ -43,24 +53,24 @@ public class Work {
         this(iName);
         startDate = iStartDate;
         duration = iDuration;
-        prevWork = null;
+        prevWorks = new ArrayList<>();
         updateEndDate();
     }
 
 
     public void setAfter(Work iWork)
     {
-        prevWork = iWork;
+        prevWorks.add(iWork);
     }
 
     public void setStartDate(Double iStartDate) {
         startDate = iStartDate;
-        updateEndDate();
+        //updateEndDate();
     }
 
     public void setDuration(Double iDuration) {
         duration = iDuration;
-        updateEndDate();
+        //updateEndDate();
     }
 
     public void setEndDate(Double iEndDate)
@@ -83,15 +93,37 @@ public class Work {
         workParam = param;
     }
 
+    public void setCriticalWork()
+    {
+        isOnCrititcalPath = true;
+    }
+
+    public void unsetCriticalWork()
+    {
+        isOnCrititcalPath = false;
+    }
+
+    public void updateWorkLimits()
+    {
+        if(workParam == WorkParam.ASAP || workParam == null)
+        {
+            updateEndDate();
+        }
+        else if (workParam == WorkParam.ALAP)
+        {
+            updateStartDate();
+        }
+    }
+
     public  Double getStart() { return startDate;}
 
     public Double getEnd() {
         return endDate;
     }
 
-    public Work getPrevWork()
+    public ArrayList<Work> getPrevWork()
     {
-        return prevWork;
+        return prevWorks;
     }
 
     public String getName()
@@ -106,15 +138,31 @@ public class Work {
 
     public Double getDuration(){ return duration;}
 
+    public Boolean isOnCrititcalPath()
+    {
+        return  isOnCrititcalPath;
+    }
+
     @Override
     public String toString() {
-        if(prevWork != null)
-        return "Id: " + id.toString() + " | Name: " + name +  " | StartDate: "
-                + startDate.toString() + " | Duration: " + duration + " | End: " + endDate.toString() + " PrevWork = " + prevWork.getId().toString();
-        else
-            return "Id: " + id.toString() + " | Name: " + name +  " | StartDate: "
-                    + startDate.toString() + " | Duration: " + duration + " | End: " + endDate.toString();
+        String criticalPath = " ";
+        if(isOnCrititcalPath)
+            criticalPath = "@";
+        String params = "";
+        if(workParam != null)
+        {
+            params = "| Params: " +  workParam.toString();
+        }
 
+        String prevWork ="";
+        if(prevWorks.size() != 0) {
+            prevWork = " | Prev works: ";
+            for (Work w : prevWorks) {
+                prevWork += w.getId().toString() + " ";
+            }
+        }
+            return criticalPath + "Id: " + id.toString() + " | Name: " + name +  " | StartDate: "
+                    + startDate.toString() + " | Duration: " + duration + " | End: " + endDate.toString() + prevWork + params;
     }
 
 }

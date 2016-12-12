@@ -11,16 +11,16 @@ public class WorkTreeNode {
 
     private NodeType type;
     private Work nodeWork;
-    private ArrayList<WorkTreeNode> nodes;
-    private WorkTreeNode prevNode;
+    private ArrayList<WorkTreeNode> next;
+    private ArrayList<WorkTreeNode> prev;
     private WorkTreeNode endNode;
 
     public  WorkTreeNode(NodeType iType, Work iWork)
     {
 
-        nodes = new ArrayList<>();
+        next = new ArrayList<>();
         type = iType;
-        prevNode = null;
+        prev = new ArrayList<>();
         endNode = null;
         if(type == NodeType.WorkNode)
             nodeWork = iWork;
@@ -37,19 +37,34 @@ public class WorkTreeNode {
 
     public void setPrevNode(WorkTreeNode iNode)
     {
-        prevNode = iNode;
+        prev.add(iNode);
+    }
+
+    public  void removePrevNode(WorkTreeNode iNode)
+    {
+        Integer deleteIndex = -1;
+        for(int i = 0; i < prev.size(); ++i)
+        {
+            if(prev.get(i) == iNode)
+                deleteIndex = i;
+        }
+        if(deleteIndex != -1)
+        prev.remove(deleteIndex);
     }
 
     public void addEndNode(WorkTreeNode treeNode)
     {
         endNode = treeNode;
+        endNode.setPrevNode(this);
     }
 
     public void addChild(WorkTreeNode treeNode)
     {
-        nodes.add(treeNode);
-        if(endNode != null)
+        next.add(treeNode);
+        if(endNode != null) {
+            endNode.removePrevNode(treeNode);
             endNode = null;
+        }
     }
 
     public WorkTreeNode getEndNode()
@@ -57,14 +72,14 @@ public class WorkTreeNode {
         return endNode;
     }
 
-    public WorkTreeNode getPrevNode()
+    public ArrayList<WorkTreeNode> getPrevNodes()
     {
-        return prevNode;
+        return prev;
     }
 
-    public ArrayList<WorkTreeNode> getChilds()
+    public ArrayList<WorkTreeNode> getNextNodes()
     {
-        return nodes;
+        return next;
     }
 
     public Work getWork()
