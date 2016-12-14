@@ -38,8 +38,7 @@ public class Project {
     {
             OutputStream fOStream = System.out;
             OutputStreamWriter outSWriter = new OutputStreamWriter(fOStream);
-            PrintWriter writer = new PrintWriter(outSWriter);
-            return writer;
+            return new PrintWriter(outSWriter);
     }
 
     public Project(String iName)
@@ -218,7 +217,7 @@ public class Project {
                 writer.println(w);
             }
             writer.println(partDelimeter);
-            drawWorkDiagramForward(writer, workMap);
+            drawWorkDiagramFinal(writer, workMap);
             //projectTree.printTree(writer);
             writer.println(partDelimeter);
             writer.close();
@@ -249,7 +248,7 @@ public class Project {
                 writer.println(w);
             }
             writer.println(partDelimeter);
-            drawWorkDiagramForward(writer, workMap);
+            drawWorkDiagramFinal(writer, workMap);
             //projectTree.printTree(writer);
             writer.println(partDelimeter);
             writer.close();
@@ -273,11 +272,11 @@ public class Project {
             ArrayList<WorkTreeNode> prevNodes = node.getPrevNodes();
             for(WorkTreeNode i: prevNodes)
             {
-                if(i.getWork().getStart() + i.getWork().getDuration() > maxStart)
-                    maxStart = i.getWork().getStart() + i.getWork().getDuration();
+                if(i.getWork().getMinStarDate() + i.getWork().getDuration() > maxStart)
+                    maxStart = i.getWork().getMinStarDate() + i.getWork().getDuration();
             }
 
-            node.getWork().setStartDate(maxStart);
+            node.getWork().setMinStartDate(maxStart);
 
         }
 
@@ -288,34 +287,56 @@ public class Project {
         }
     }
 
-    public void finalTreeMoving(WorkTreeNode node)
+    public void updateChildLimits(WorkTreeNode node, LinkedHashMap<Integer, Work> onOptimizedWorks)
+    {
+       //if(node.getWork() != null && !node.isEndNode())
+       //    return;
+
+        for(WorkTreeNode it: node.getNextNodes())
+        {
+            if(onOptimizedWorks.get(it.getWork().getId())!= null)
+            {
+                it.getWork().setStartDate(node.getWork().getEnd());
+                it.getWork().updateWorkLimits();
+                onOptimizedWorks.remove(it.getWork().getId());
+                updateChildLimits(it, onOptimizedWorks);
+
+            }
+        }
+    }
+
+    public void finalTreeMoving(WorkTreeNode node, LinkedHashMap<Integer, Work> unOptimizedWorks)
     {
 
         if(node.isEndNode()) {
             return;
         }
 
-        if(node.getWork() != null)
+        if(node.getWork() != null && unOptimizedWorks.get(node.getWork().getId()) != null)
         {
-            double delta = node.getWork().getEnd() - node.getWork().getStart();
+            double delta = node.getWork().getMaxEndDate() - node.getWork().getMinStarDate();
+            node.getWork().setStartDate(node.getWork().getMinStarDate());
+            node.getWork().setEndDate(node.getWork().getMaxEndDate());
+
             if(delta != node.getWork().getDuration())
             {
-                node.getWork().unsetCriticalWork();
-                node.getWork().updateWorkLimits();
-                //for(WorkTreeNode it: node.getNextNodes())
-                // {
-                //     it.getWork().setStartDate(node.getWork().getEnd());
-                //     it.getWork().updateWorkLimits();
-                // }
+                    node.getWork().unsetCriticalWork();
+                    node.getWork().updateWorkLimits();
+                    updateChildLimits(node, unOptimizedWorks);
+                    unOptimizedWorks.remove(node.getWork().getId());
             }
             else
+            {
                 node.getWork().setCriticalWork();
+                unOptimizedWorks.remove(node.getWork().getId());
+
+            }
         }
 
         ArrayList<WorkTreeNode> childs = node.getNextNodes();
 
         for (WorkTreeNode it: childs) {
-            finalTreeMoving(it);
+            finalTreeMoving(it, unOptimizedWorks);
         }
     }
 
@@ -325,16 +346,16 @@ public class Project {
             return;
 
         if(node.getWork() != null && node.getWork().getEnd() == 0)
-            node.getWork().setEndDate(endDate);
+            node.getWork().setMaxEndDate(endDate);
         Double minStart = Double.MAX_VALUE;
         if(node.getNextNodes().size() != 0 && !node.isEndNode())
         {
             ArrayList<WorkTreeNode> nextNodes = node.getNextNodes();
             for(WorkTreeNode it: nextNodes){
-                if(it.getWork().getEnd() - it.getWork().getDuration() < minStart)
-                    minStart = it.getWork().getEnd() - it.getWork().getDuration();
+                if(it.getWork().getMaxEndDate() - it.getWork().getDuration() < minStart)
+                    minStart = it.getWork().getMaxEndDate() - it.getWork().getDuration();
             }
-            node.getWork().setEndDate(minStart);
+            node.getWork().setMaxEndDate(minStart);
         }
 
         ArrayList<WorkTreeNode> prevNodes = node.getPrevNodes();
@@ -354,8 +375,10 @@ public class Project {
             analyzeBackwardWork();
             drawWorkDiagramBackward(writer, workMap);
             writer.println("---------------------------------");
-            finalAnalyzeWorks();
-            drawWorkDiagramForward(writer, workMap);
+            LinkedHashMap<Integer, Work> unOptimizedWorks = new LinkedHashMap<>();
+            unOptimizedWorks.putAll(workMap);
+            finalAnalyzeWorks(unOptimizedWorks);
+            drawWorkDiagramFinal(writer, workMap);
             writer.close();
     }
 
@@ -367,7 +390,9 @@ public class Project {
             //drawWorkDiagramForward(writer, workMap);
             analyzeBackwardWork();
             //drawWorkDiagramBackward(writer, workMap);
-            finalAnalyzeWorks();
+            LinkedHashMap<Integer, Work> unOptimizedWorks = new LinkedHashMap<>();
+            unOptimizedWorks.putAll(workMap);
+            finalAnalyzeWorks(unOptimizedWorks);
             //drawWorkDiagramForward(writer, workMap);
             //writer.close();
 
@@ -386,14 +411,17 @@ public class Project {
         forwardTreeMoving(startTreeNode);
     }
 
-    public void finalAnalyzeWorks()
+    public void finalAnalyzeWorks(LinkedHashMap<Integer, Work> unOptimizedWorks)
     {
-        //WorkTreeNode startTreeNode = projectTree.getStartTreeNode();
-        //finalTreeMoving(startTreeNode);
+        WorkTreeNode startTreeNode = projectTree.getStartTreeNode();
+        finalTreeMoving(startTreeNode, unOptimizedWorks);
 
+        /*
         for(Work w: workMap.values())
         {
-            Double duration = w.getEnd() - w.getStart();
+            Double duration = w.getMaxEndDate() - w.getMinStarDate();
+            w.setStartDate(w.getMinStarDate());
+            w.setEndDate(w.getMaxEndDate());
             if(!duration.equals(w.getDuration()))
             {
                 w.unsetCriticalWork();
@@ -402,6 +430,7 @@ public class Project {
             else
                 w.setCriticalWork();
         }
+        */
     }
 
     public void analyzeBackwardWork()
@@ -409,7 +438,7 @@ public class Project {
         WorkTreeNode endTreeNode = projectTree.getEndTreeNode();
         for(Work w: workMap.values())
         {
-            w.setEndDate(endDate);
+            w.setMaxEndDate(endDate);
         }
         for(Work w: workMap.values()) {
             System.out.println(w);
@@ -425,7 +454,7 @@ public class Project {
             String length = "";
             String criticalPath = " ";
             Double duration = it.getDuration();
-            for(int i = 0; i < it.getStart(); ++i)
+            for(int i = 0; i < it.getMinStarDate(); ++i)
                 spacer += " ";
 
            for(int i =0; i < duration.intValue(); ++i)
@@ -440,6 +469,50 @@ public class Project {
     }
 
     void drawWorkDiagramForward(Map<Integer, Work> workList)
+    {
+        for(Work it: workList.values())
+        {
+            String spacer = "";
+            String length = "";
+            String criticalPath = " ";
+            Double duration = it.getDuration();
+            for(int i = 0; i < it.getMinStarDate(); ++i)
+                spacer += " ";
+
+            for(int i =0; i < duration.intValue(); ++i)
+                length += "#";
+
+            if(it.isOnCrititcalPath())
+                criticalPath = "@";
+            System.out.print(criticalPath + " ");
+            System.out.format("%1$3s", it.getId().toString());
+            System.out.println(criticalPath + spacer + length);
+        }
+    }
+
+    void drawWorkDiagramFinal(PrintWriter writer, Map<Integer, Work> workList)
+    {
+        for(Work it: workList.values())
+        {
+            String spacer = "";
+            String length = "";
+            String criticalPath = " ";
+            Double duration = it.getDuration();
+            for(int i = 0; i < it.getStart(); ++i)
+                spacer += " ";
+
+            for(int i =0; i < duration.intValue(); ++i)
+                length += "#";
+            if(it.isOnCrititcalPath())
+                criticalPath = "@";
+
+            writer.print(criticalPath + " ");
+            writer.format("%1$3s", it.getId().toString());
+            writer.println(spacer + length);
+        }
+    }
+
+    void drawWorkDiagramFinal(Map<Integer, Work> workList)
     {
         for(Work it: workList.values())
         {
@@ -469,7 +542,7 @@ public class Project {
             String length = "";
             String criticalPath = " ";
             Double duration = it.getDuration();
-            for(int i = 0; i < it.getEnd() - it.getDuration(); ++i)
+            for(int i = 0; i < it.getMaxEndDate() - it.getDuration(); ++i)
                 spacer += " ";
 
             for(int i =0; i < duration.intValue(); ++i)
@@ -491,7 +564,7 @@ public class Project {
             String length = "";
             String criticalPath = " ";
             Double duration = it.getDuration();
-            for(int i = 0; i < it.getEnd() - it.getDuration(); ++i)
+            for(int i = 0; i < it.getMaxEndDate() - it.getDuration(); ++i)
                 spacer += " ";
 
             for(int i =0; i < duration.intValue(); ++i)

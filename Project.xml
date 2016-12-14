@@ -57,7 +57,7 @@
             <startDate/>
             <endDate/>
             <duration>2.0</duration>
-            <params></params>
+            <params>ALAP</params>
             <afterList>
                 <after>6</after>
             </afterList>

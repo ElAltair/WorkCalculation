@@ -10,6 +10,9 @@ public class Work {
     private Integer id;
     private Double startDate;
     private Double endDate;
+    private Double minStarDate;
+    private Double maxEndDate;
+
     private Double duration;
     private Boolean isOnCrititcalPath;
     private ArrayList<Work> prevWorks;
@@ -29,6 +32,8 @@ public class Work {
         startDate = 0.0;
         duration = 0.0;
         endDate = 0.0;
+        minStarDate = 0.0;
+        maxEndDate = 0.0;
         isOnCrititcalPath = false;
         prevWorks = new ArrayList<>();
     }
@@ -38,6 +43,8 @@ public class Work {
         startDate = 0.0;
         duration = 0.0;
         endDate = 0.0;
+        minStarDate = 0.0;
+        maxEndDate = 0.0;
         prevWorks = new ArrayList<>();
         updateEndDate();
     }
@@ -68,6 +75,11 @@ public class Work {
         //updateEndDate();
     }
 
+    public void setMinStartDate(Double iMinStartDate)
+    {
+        minStarDate = iMinStartDate;
+    }
+
     public void setDuration(Double iDuration) {
         duration = iDuration;
         //updateEndDate();
@@ -76,6 +88,11 @@ public class Work {
     public void setEndDate(Double iEndDate)
     {
         endDate = iEndDate;
+    }
+
+    public void setMaxEndDate(Double iMaxEndDate)
+    {
+        maxEndDate = iMaxEndDate;
     }
 
     public void setName(String iName)
@@ -117,8 +134,17 @@ public class Work {
 
     public  Double getStart() { return startDate;}
 
+    public Double getMinStarDate()
+    {
+        return  minStarDate;
+    }
+
     public Double getEnd() {
         return endDate;
+    }
+
+    public Double getMaxEndDate() {
+        return maxEndDate;
     }
 
     public ArrayList<Work> getPrevWork()
