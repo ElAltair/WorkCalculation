@@ -372,11 +372,23 @@ public class Project {
             analyzeForwardWork();
             drawWorkDiagramForward(writer, workMap);
             writer.println("---------------------------------");
+            Double maxDate = Double.MIN_VALUE;
+            for(Work i : workMap.values())
+            {
+                if(i.getMinStarDate() + i.getDuration() > maxDate)
+                    maxDate = i.getMinStarDate() + i.getDuration();
+            }
+            System.out.println(maxDate);
+            endDate = maxDate;
             analyzeBackwardWork();
             drawWorkDiagramBackward(writer, workMap);
             writer.println("---------------------------------");
             LinkedHashMap<Integer, Work> unOptimizedWorks = new LinkedHashMap<>();
             unOptimizedWorks.putAll(workMap);
+            for(Work i: unOptimizedWorks.values())
+            {
+                System.out.println(i);
+            }
             finalAnalyzeWorks(unOptimizedWorks);
             drawWorkDiagramFinal(writer, workMap);
             writer.close();

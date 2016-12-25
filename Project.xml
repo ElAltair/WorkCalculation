@@ -2,7 +2,7 @@
 <project>
     <name>Test</name>
     <startDate> 0.0 </startDate>
-    <endDate> 30.0 </endDate>
+    <endDate> 29.0 </endDate>
     <workList>
         <work id="1">
             <name>First Work</name>
@@ -16,7 +16,7 @@
             <name>Third Work</name>
             <startDate/>
             <endDate/>
-            <duration>12.0</duration>
+            <duration>11.0</duration>
             <params></params>
             <afterList>
                 <after>1</after>
