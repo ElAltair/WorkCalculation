@@ -14,7 +14,7 @@ public class Work {
     private Double maxEndDate;
 
     private Double duration;
-    private Boolean isOnCrititcalPath;
+    Boolean isOnCrititcalPath;
     private ArrayList<Work> prevWorks;
     private String name;
 
@@ -164,7 +164,7 @@ public class Work {
 
     public Double getDuration(){ return duration;}
 
-    public Boolean isOnCrititcalPath()
+    public Boolean isOnCriticalPath()
     {
         return  isOnCrititcalPath;
     }

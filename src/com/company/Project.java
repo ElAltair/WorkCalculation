@@ -366,7 +366,7 @@ public class Project {
 
     }
 
-    public void analyzeWorks()
+    public Map<Integer, Work> analyzeWorks()
     {
             PrintWriter writer = getProjectWriter();
             analyzeForwardWork();
@@ -390,8 +390,11 @@ public class Project {
                 System.out.println(i);
             }
             finalAnalyzeWorks(unOptimizedWorks);
+
             drawWorkDiagramFinal(writer, workMap);
             writer.close();
+
+            return workMap;
     }
 
     public void analyzeWorks(String fileName)
@@ -471,7 +474,7 @@ public class Project {
 
            for(int i =0; i < duration.intValue(); ++i)
                length += "#";
-            if(it.isOnCrititcalPath())
+            if(it.isOnCriticalPath())
                 criticalPath = "@";
 
             writer.print(criticalPath + " ");
@@ -494,7 +497,7 @@ public class Project {
             for(int i =0; i < duration.intValue(); ++i)
                 length += "#";
 
-            if(it.isOnCrititcalPath())
+            if(it.isOnCriticalPath())
                 criticalPath = "@";
             System.out.print(criticalPath + " ");
             System.out.format("%1$3s", it.getId().toString());
@@ -515,7 +518,7 @@ public class Project {
 
             for(int i =0; i < duration.intValue(); ++i)
                 length += "#";
-            if(it.isOnCrititcalPath())
+            if(it.isOnCriticalPath())
                 criticalPath = "@";
 
             writer.print(criticalPath + " ");
@@ -538,7 +541,7 @@ public class Project {
             for(int i =0; i < duration.intValue(); ++i)
                 length += "#";
 
-            if(it.isOnCrititcalPath())
+            if(it.isOnCriticalPath())
                 criticalPath = "@";
             System.out.print(criticalPath + " ");
             System.out.format("%1$3s", it.getId().toString());
@@ -560,7 +563,7 @@ public class Project {
             for(int i =0; i < duration.intValue(); ++i)
                 length += "#";
 
-            if(it.isOnCrititcalPath())
+            if(it.isOnCriticalPath())
                 criticalPath = "@";
             writer.print(criticalPath + " ");
             writer.format("%1$3s", it.getId().toString());
@@ -581,7 +584,7 @@ public class Project {
 
             for(int i =0; i < duration.intValue(); ++i)
                 length += "#";
-            if(it.isOnCrititcalPath())
+            if(it.isOnCriticalPath())
                 criticalPath = "@";
             System.out.print(criticalPath + " ");
             System.out.format("%1$3s", it.getId().toString());

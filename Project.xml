@@ -16,7 +16,7 @@
             <name>Third Work</name>
             <startDate/>
             <endDate/>
-            <duration>11.0</duration>
+            <duration>7.0</duration>
             <params></params>
             <afterList>
                 <after>1</after>
@@ -26,7 +26,7 @@
             <name>Five Work</name>
             <startDate/>
             <endDate/>
-            <duration>3.0</duration>
+            <duration>6.0</duration>
             <params>ASAP</params>
             <afterList>
                 <after>3</after>
@@ -36,7 +36,7 @@
             <name>Six Work</name>
             <startDate/>
             <endDate/>
-            <duration>1.0</duration>
+            <duration>4.0</duration>
             <params/>
             <afterList>
                 <after>3</after>
@@ -66,7 +66,7 @@
             <name>Eight Work</name>
             <startDate/>
             <endDate/>
-            <duration>3.0</duration>
+            <duration>9.0</duration>
             <params/>
             <afterList>
                 <after>4</after>
@@ -93,6 +93,36 @@
             <params></params>
             <afterList>
                 <after>4</after>
+            </afterList>
+        </work>
+        <work id ="11">
+            <name>Nin1e Work</name>
+            <startDate/>
+            <endDate/>
+            <duration>8.0</duration>
+            <params></params>
+            <afterList>
+                <after>6</after>
+            </afterList>
+        </work>
+        <work id ="12">
+            <name>Ni2ne Work</name>
+            <startDate/>
+            <endDate/>
+            <duration>9.0</duration>
+            <params></params>
+            <afterList>
+                <after>8</after>
+            </afterList>
+        </work>
+        <work id ="13">
+            <name>Ni3ne Work</name>
+            <startDate/>
+            <endDate/>
+            <duration>3.0</duration>
+            <params></params>
+            <afterList>
+                <after>3</after>
             </afterList>
         </work>
     </workList>

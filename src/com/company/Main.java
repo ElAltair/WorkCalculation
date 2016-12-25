@@ -1,5 +1,7 @@
 package com.company;
 
+import java.util.Map;
+
 public class Main {
 
 
@@ -7,14 +9,15 @@ public class Main {
 
         try{
             Project project = new Project("Test","Project.xml");
-            project.analyzeWorks();
+            Map<Integer, Work> map = project.analyzeWorks();
             project.printProject();
             project.printProject("ProjectReport.txt");
+            JavafxPostProcessor.map = map;
+            JavafxPostProcessor.main(new String[0]);
         }
         catch (Exception e)
         {
-            System.out.println(e.getStackTrace());
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }
